@@ -1,4 +1,4 @@
-# Terraform Interview Q&A
+# Terraform Interview Q & A
 
 ## 1. What is Terraform and why is it used?
 
