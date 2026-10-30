@@ -11,6 +11,89 @@ Why it's used:
 - **Automation** — removes manual point-and-click console work, reducing human error.
 - **Plan-before-apply** — you can preview changes before they happen.
 
+# 🏗️ Terraform – Cheat Sheet
+
+Infrastructure as Code for AWS: **VPC, ALB, ECR, ECS Fargate, S3, CloudWatch**.
+
+## Suggested structure
+```
+.
+├── modules/            # reusable modules (vpc, alb, ecs-service)
+├── environments/
+│   ├── dev/
+│   └── prod/
+├── main.tf  variables.tf  outputs.tf  providers.tf  versions.tf
+└── terraform.tfvars    # values per environment (no secrets)
+```
+
+## Core workflow
+```bash
+terraform init          # download providers, configure backend
+terraform fmt -recursive
+terraform validate
+terraform plan -out=tfplan
+terraform apply tfplan
+terraform destroy       # tear down (use with care)
+```
+Handy extras: `terraform state list`, `terraform output`, `terraform import`, `terraform workspace list`.
+
+## Best practices
+- Store state remotely in **S3** with locking (DynamoDB or S3 native lockfile) and encryption on
+- Never commit `*.tfstate` or secrets; add them to `.gitignore`
+- Pin Terraform and provider versions in `versions.tf`
+- Use **modules** and variables instead of copy-paste; give every variable a type and description
+- Tag all resources (`Project`, `Environment`, `Owner`)
+- Always review `terraform plan` before `apply`; run it automatically on pull requests
+- Apply least-privilege IAM and scan code with `trivy config .` or `tfsec`
+- Keep one environment per folder or workspace to limit blast radius
+
+## Example: remote backend and provider
+```hcl
+terraform {
+  required_version = ">= 1.6"
+  required_providers {
+    aws = { source = "hashicorp/aws", version = "~> 5.0" }
+  }
+  backend "s3" {
+    bucket  = "my-tf-state-bucket"
+    key     = "dev/terraform.tfstate"
+    region  = "us-east-1"
+    encrypt = true
+  }
+}
+
+provider "aws" {
+  region = var.region
+}
+```
+
+## Example: ECS Fargate service (trimmed)
+```hcl
+resource "aws_ecs_cluster" "this" {
+  name = "${var.project}-${var.env}"
+}
+
+resource "aws_ecs_service" "app" {
+  name            = "app"
+  cluster         = aws_ecs_cluster.this.id
+  task_definition = aws_ecs_task_definition.app.arn
+  desired_count   = 2
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    subnets          = var.private_subnet_ids
+    security_groups  = [aws_security_group.app.id]
+    assign_public_ip = false
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.app.arn
+    container_name   = "app"
+    container_port   = 8080
+  }
+}
+```
+
 ## 2. What is the difference between Terraform and Ansible?
 
 | Aspect | Terraform | Ansible |
