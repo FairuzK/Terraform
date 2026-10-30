@@ -1,8 +1,10 @@
-# Terraform Interview Q&A
+# 🏗️ Terraform – Cheat Sheet
 
 ## 1. What is Terraform and why is it used?
 
 Terraform is an open-source **Infrastructure as Code (IaC)** tool created by HashiCorp. It lets you define cloud and on-prem infrastructure (servers, networks, databases, DNS, load balancers, etc.) in declarative configuration files (HCL — HashiCorp Configuration Language), and then creates, updates, or destroys that infrastructure to match the desired state.
+
+Infrastructure as Code for AWS: **VPC, ALB, ECR, ECS Fargate, S3, CloudWatch**.
 
 Why it's used:
 - **Consistency & repeatability** — same config produces the same infrastructure every time.
@@ -11,9 +13,6 @@ Why it's used:
 - **Automation** — removes manual point-and-click console work, reducing human error.
 - **Plan-before-apply** — you can preview changes before they happen.
 
-# 🏗️ Terraform – Cheat Sheet
-
-Infrastructure as Code for AWS: **VPC, ALB, ECR, ECS Fargate, S3, CloudWatch**.
 
 ## Suggested structure
 ```
