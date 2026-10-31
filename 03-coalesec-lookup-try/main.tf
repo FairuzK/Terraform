@@ -46,14 +46,12 @@ locals {
       jsondecode(file("${path.module}/config.json")).my_setting,
       null
     )
-    enviroment_value = lookup(var.enviroment_settings, "my_setting", null)
-  
+    enviroment_value = lookup(var.enviroment_settings, "my_setting", null)  
 }
 resource "null_resource" "example_config" {
     triggers = {
         seeting_in_use = coalesce(
             local.config_file_value, local.enviroment_value, "default-value")
-    }
-  
+    } 
 }
   
