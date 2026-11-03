@@ -41,6 +41,7 @@ variable "enviroment_settings" {
   }
 }
 
+# Local values to store the results of the coalesce and lookup functions
 locals {
     config_file_value = try(
       jsondecode(file("${path.module}/config.json")).my_setting,
@@ -48,6 +49,7 @@ locals {
     )
     enviroment_value = lookup(var.enviroment_settings, "my_setting", null)  
 }
+# Line 1: The coalesce function is used to return the first non-null value from a list of values. In this case, it checks the local.config_file_value and local.enviroment_value, and if both are null, it returns "default-value".
 resource "null_resource" "example_config" {
     triggers = {
         seeting_in_use = coalesce(
