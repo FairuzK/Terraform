@@ -9,6 +9,7 @@ locals {
 
 resource "null_resource" "forloop_example" {
     triggers = {
+        # List of development regions
         dev_regions = join(",", local.dev_regions)
     }
 }
